@@ -1,16 +1,21 @@
+import os
+
 import streamlit as st
 from lyzr_automata.ai_models.openai import OpenAIModel
 from lyzr_automata import Agent, Task
 from lyzr_automata.pipelines.linear_sync_pipeline import LinearSyncPipeline
 from PIL import Image
+from dotenv import load_dotenv
+
+load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY")
+
 st.set_page_config(
     page_title="Real Estate Listing Description Generator",
     layout="centered",  # or "wide"
     initial_sidebar_state="auto",
     page_icon="lyzr-logo-cut.png",
 )
-
-api = st.sidebar.text_input("Enter Your OPENAI API KEY HERE",type="password")
 
 
 st.markdown(
@@ -29,20 +34,20 @@ st.image(image, width=150)
 
 # App title and introduction
 st.title("Real Estate Listing Description Generator🏙️")
-st.sidebar.markdown("### Welcome to the Lyzr Real Estate Listing Description Generator!")
+st.markdown("### Welcome to the Lyzr Real Estate Listing Description Generator!")
 st.markdown(
     "This app uses Lyzr Automata Agent to Generate Real Estate Listing Description based on Project Name,Size,Locality and other details")
-if api:
-    open_ai_text_completion_model = OpenAIModel(
-        api_key=api,
-        parameters={
-            "model": "gpt-4-turbo-preview",
-            "temperature": 0.2,
-            "max_tokens": 1500,
-        },
-    )
-else:
-    st.sidebar.error("Please Enter Your OPENAI API KEY")
+
+
+open_ai_text_completion_model = OpenAIModel(
+    api_key=api_key,
+    parameters={
+        "model": "gpt-4-turbo-preview",
+        "temperature": 0.2,
+        "max_tokens": 1500,
+    },
+)
+
 
 name = st.text_input("Project Name", placeholder="Lodha World View")
 size_range = st.slider("Size Range", 100, 10000, (800, 1800))
@@ -113,7 +118,7 @@ def re_description(project_name, size_range, project_size, avg_price, configurat
     return answer
 
 
-if api and st.button("Generate", type="primary"):
+if st.button("Generate", type="primary"):
     result = re_description(name,size_range,project_size,avg_price,configuration,locality)
     st.markdown(result)
 
